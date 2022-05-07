@@ -1,0 +1,48 @@
+server {
+client_max_body_size 400M;
+proxy_set_header X-Forwarded-Proto $scheme;
+    server_name {{ hostname }};
+    root /var/www/html/{{ project_name }}/public;
+
+    index index.html index.htm index.php ;
+        set $no_cache 1;
+        # Check for cache bypass
+        if ($arg_skipcache = 1) {
+          set $no_cache 1;
+}
+    charset utf-8;
+location = /firebase-messaging-sw.js {
+
+}
+
+location / {
+       try_files $uri $uri/ /index.php?$args;
+
+  location ~ \.php$ {
+       include fastcgi_params;
+       fastcgi_intercept_errors on;
+       fastcgi_pass unix:/run/php/php{{ php_version }}-fpm.sock;
+       fastcgi_param SCRIPT_FILENAME $request_filename;
+       fastcgi_cache_valid 200 5m;
+       fastcgi_cache_bypass $no_cache;
+       fastcgi_no_cache $no_cache;
+       fastcgi_buffers 16 16k;
+       fastcgi_buffer_size 32k;
+    }
+
+}
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    } 
+
+
+    listen 80;
+
+}
+

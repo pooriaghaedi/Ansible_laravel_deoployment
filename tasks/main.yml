@@ -1,0 +1,125 @@
+---
+- name: install common
+  apt: name=software-properties-common
+
+- name: "Repository PHP 8"
+  apt_repository:
+    repo="ppa:ondrej/php"
+- name: "Updating the repo"
+  apt: update_cache=yes
+
+- name: Installation PHP 8.0
+  apt: name=php8.1 state=present
+- name: install lamp stack
+  apt:
+    pkg:
+      - php8.1-mysql
+      - php8.1-curl
+      - php8.1-xsl
+      - php8.1-gd
+      - php8.1-mbstring
+      - php8.1-zip
+      - php8.1-xmlrpc
+      - php8.1-soap
+      - php8.1-intl
+      - php8.1-ldap
+      - nginx
+      - mysql-server
+      - gcc
+      - python3-pip
+      - python3-certbot-nginx
+    state: present
+    update_cache: yes
+- name: Install pymsql
+  pip:
+    name:
+      - PyMySQL
+    state: present
+    executable: pip3
+
+- name: "Read Checksum"
+  shell: curl https://getcomposer.org/download/latest-stable/composer.phar.sha256
+  register: composer_checksum
+
+- name: "Download PHAR file"
+  ansible.builtin.get_url:
+    url: https://getcomposer.org/download/latest-stable/composer.phar
+    dest: /usr/local/bin/composer
+    force: yes
+    checksum: "sha256:{{ composer_checksum.stdout }}"
+- name: Set permissions on Composer
+  file:
+    path: /usr/local/bin/composer
+    mode: "a+x"
+- name: "Read composer version"
+  shell: composer -V
+  register: composer_version
+- name: start and enable httpd
+  service:
+    name: nginx
+    state: started
+    enabled: true
+- name: install vhost config file
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-enabled/{{ project_name }}.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Generate an OpenSSH keypair with the default values (4096 bits, rsa) and encrypted private key
+  community.crypto.openssh_keypair:
+    path: "{{ ansible_role_name }}/files/id_ssh_rsa"
+- name: Display resolv.conf contents
+  command: cat id_ssh_rsa.pub chdir="{{ ansible_role_name }}/files/"
+  register: command_output
+
+- name: Print to console
+  debug:
+    msg: "{{command_output.stdout}}"
+
+- name: pause
+  pause: 
+    prompt: Is the public key added to github (yes/no)?
+  register: key_added
+- name: Deploy site files from Github repository
+  git:
+    repo: "{{ github_repo }}"
+    dest: /var/www/html/{{ project_name }}
+    key_file: "{{ ansible_role_name }}/files/id_ssh_rsa"
+    accept_hostkey: yes
+  when: key_added.user_input | bool
+
+- name: Give insecure permissions to an existing file
+  ansible.builtin.file:
+    path: /var/www/html/{{ project_name }}
+    owner: www-data
+    group: www-data
+    mode: '0755'
+- name: install composer
+  composer: 
+    command: install
+    global_command: false
+    working_dir: /var/www/html/{{ project_name }}
+  environment:
+    COMPOSER_NO_INTERACTION: "1"
+#- name: get public IP 
+#  uri: 
+#    url: https://api.ipify.org?format=text
+#    method: GET
+#    return_content: yes
+#  tags: test
+#  register: IPAddress
+#- name: get IP address
+#  set_fact:
+#    dataresult: "{{IPAddress.stdout | from_json}}"
+#  tags: test
+#- name: show IP address
+#  debug:
+#    msg: "{{ dataresult.data[0].content }}"
+#  tags: test
+
+- name: get Certbot certificate
+  ansible.builtin.command: certbot --nginx --email "{{ email_address }}" -d {{ hostname }} --non-interactive --agree-tos
+  tags: test
+
