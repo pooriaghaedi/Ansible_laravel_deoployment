@@ -24,17 +24,18 @@ Example Playbook
 
 Including an example of how to use the role :
 
+```yaml
 - hosts: local
   become: yes
   roles:
-      - /root/Ansible_laravel_deoployment
+      - ./Ansible_laravel_deoployment
   vars: 
     github_repo: 
     hostname: 
     project_name: 
     php_version: 8.1
     email_address:
-
+```
 
 Features
 ------------
