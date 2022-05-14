@@ -8,22 +8,22 @@
 - name: "Updating the repo"
   apt: update_cache=yes
 
-- name: Installation PHP 8.0
-  apt: name=php"{{ php_version }} state=present
+- name: Installation PHP{{ php_version }}
+  apt: name=php{{ php_version }} state=present
 - name: install lamp stack
   apt:
     pkg:
-      - php"{{ php_version }}-mysql
-      - php"{{ php_version }}-curl
-      - php"{{ php_version }}-xsl
-      - php"{{ php_version }}-gd
-      - php"{{ php_version }}-mbstring
-      - php"{{ php_version }}-zip
-      - php"{{ php_version }}-xmlrpc
-      - php"{{ php_version }}-soap
-      - php"{{ php_version }}-intl
-      - php"{{ php_version }}-ldap
-      - php"{{ php_version }}-fpm
+      - php{{ php_version }}-mysql
+      - php{{ php_version }}-curl
+      - php{{ php_version }}-xsl
+      - php{{ php_version }}-gd
+      - php{{ php_version }}-mbstring
+      - php{{ php_version }}-zip
+      - php{{ php_version }}-xmlrpc
+      - php{{ php_version }}-soap
+      - php{{ php_version }}-intl
+      - php{{ php_version }}-ldap
+      - php{{ php_version }}-fpm
       - nginx
       - mysql-server
       - gcc
