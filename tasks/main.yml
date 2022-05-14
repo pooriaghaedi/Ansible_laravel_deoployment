@@ -9,20 +9,21 @@
   apt: update_cache=yes
 
 - name: Installation PHP 8.0
-  apt: name=php8.1 state=present
+  apt: name=php"{{ php_version }} state=present
 - name: install lamp stack
   apt:
     pkg:
-      - php8.1-mysql
-      - php8.1-curl
-      - php8.1-xsl
-      - php8.1-gd
-      - php8.1-mbstring
-      - php8.1-zip
-      - php8.1-xmlrpc
-      - php8.1-soap
-      - php8.1-intl
-      - php8.1-ldap
+      - php"{{ php_version }}-mysql
+      - php"{{ php_version }}-curl
+      - php"{{ php_version }}-xsl
+      - php"{{ php_version }}-gd
+      - php"{{ php_version }}-mbstring
+      - php"{{ php_version }}-zip
+      - php"{{ php_version }}-xmlrpc
+      - php"{{ php_version }}-soap
+      - php"{{ php_version }}-intl
+      - php"{{ php_version }}-ldap
+      - php"{{ php_version }}-fpm
       - nginx
       - mysql-server
       - gcc
