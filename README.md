@@ -31,6 +31,7 @@ Here's an example of how to use this playbook:
     project_name: your_project_name
     php_version: 8.1
     email_address: your_email@domain.com
+```
 
 Features
 ------------
