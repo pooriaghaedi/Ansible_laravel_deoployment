@@ -1,28 +1,24 @@
-Ansible_laravel_deoployment
-=========
+# Ansible Laravel Deployment
 
-Deploy Laravel with one command
+This Ansible playbook allows you to deploy Laravel applications with a single command.
 
-Requirements
-------------
+## Prerequisites
 
-Ansible must be installed.
+Ensure that Ansible is installed on the machine where the playbook will be run.
 
-Role Variables
---------------
+## Configuration
 
-    github_repo: your Git repo
-    hostname: Project domain, needs an IP address pointing to your domain. Certbot needs that to issue a certificate.
-    project_name: Project name, Your repo will be cloned to /var/www/html/{poject_name}.
-    php_version: 8.1
-    email_address: your Email Address.
+Configure the playbook according to your requirements by setting the following role variables:
 
+- `github_repo`: The Git repository of your Laravel project.
+- `hostname`: The domain of your project. Make sure that the domain's DNS is already pointed to the IP address of your server, as this is required by Certbot to issue an SSL certificate.
+- `project_name`: The name of your project. This will be used to clone your repository to `/var/www/html/{project_name}`.
+- `php_version`: The PHP version for your Laravel project. The default version is 8.1.
+- `email_address`: Your email address, needed for Certbot notifications and recovery purposes.
 
+## Usage
 
-Example Playbook
-----------------
-
-Including an example of how to use the role :
+Here's an example of how to use this playbook:
 
 ```yaml
 - hosts: local
@@ -30,12 +26,11 @@ Including an example of how to use the role :
   roles:
       - ./Ansible_laravel_deoployment
   vars: 
-    github_repo: 
-    hostname: 
-    project_name: 
+    github_repo: your_github_repo_url
+    hostname: your_domain.com
+    project_name: your_project_name
     php_version: 8.1
-    email_address:
-```
+    email_address: your_email@domain.com
 
 Features
 ------------
